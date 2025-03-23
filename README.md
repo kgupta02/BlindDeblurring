@@ -1,7 +1,7 @@
 # BlindDeblurring
 Image Debarring using classical image processing techniques (IN PROGRESS)
 
-
+<pre> ```
 your_project/
 │
 ├── README.md
@@ -32,3 +32,4 @@ your_project/
 └── tests/                   # optional: unit tests or integration tests
     ├── test_optimization.py
     └── ...
+``` </pre>
