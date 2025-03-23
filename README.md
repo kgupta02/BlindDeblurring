@@ -2,7 +2,7 @@
 Image Debarring using classical image processing techniques (IN PROGRESS)
 
 <pre> ```
-your_project/
+BlindDeblurring/
 │
 ├── README.md
 ├── requirements.txt         # or environment.yml for conda
@@ -16,7 +16,7 @@ your_project/
 │   ├── output_deblurred.png
 │   ├── kernel_estimated.png
 │
-├── src/                     # all Python source code
+├── src/                  
 │   ├── __init__.py
 │   │
 │   ├── main_deblurring.py   # main script/entry point
