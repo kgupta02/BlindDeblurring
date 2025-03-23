@@ -1,6 +1,10 @@
 # BlindDeblurring
 Image Debarring using classical image processing techniques (IN PROGRESS)
 
+Implements "Blind Deblurring for Saturated Images" in Python
+
+Image Data from: https://drive.google.com/file/d/1Yyyub_ylDY5IXfE57DvsdecG7HlkSFBS/view
+
 <pre> ```
 BlindDeblurring/
 │
@@ -8,8 +12,8 @@ BlindDeblurring/
 ├── requirements.txt         # or environment.yml for conda
 ├── setup.py                 # optional if you want to make it installable
 │
-├── data/                    # optional: store example input images or test images
-│   ├── sample1.png
+├── data/                    # test images
+│   ├── [FILE_NAME].png
 │   ├── ...
 │
 ├── results/                 # store output images and kernels
