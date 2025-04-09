@@ -45,5 +45,5 @@ def save_kernel(path, kernel):
     kernel_vis = np.clip(kernel_vis, 0, 1)
     # Save kernel as image
     kernel_ubyte = img_as_ubyte(kernel_vis)
-    os.makesirs(os.path.dirname(path), exist_ok=True)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     io.imsave(path, kernel_ubyte)
