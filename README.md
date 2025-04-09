@@ -1,5 +1,5 @@
 # BlindDeblurring
-Image Debarring using classical image processing techniques (IN PROGRESS)
+Image Deblurring using classical image processing techniques (IN PROGRESS)
 
 Implements "Blind Deblurring for Saturated Images" in Python
 
