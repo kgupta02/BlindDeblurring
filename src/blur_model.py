@@ -14,3 +14,8 @@ def blur_model(image, kernel):
     blur_image = blur_image * mask
 
     return blur_image
+
+def compute_mask(I_blurred, K):
+    convolved = convolve2d(I_blurred, K, mode='same')
+    mask = np.where(convolved <= 1, 1, 1 / convolved)
+    return mask
