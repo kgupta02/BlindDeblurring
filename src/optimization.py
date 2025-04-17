@@ -74,6 +74,25 @@ def update_K(B, I, K_prev, M, beta, kernel_shape=(15, 15)):
     K = K / s if s > 1e-8 else np.ones(kernel_shape) / (kh * kw)
     return K
 
+def update_latent_image(I, K, B, latent_map, lambda_grad):
+    """
+    Update the latent image using Richardson-Lucy or similar optimization method.
+    """
+    updated_image = I * ( (B - latent_map * convolve2d(I, K, mode='same')) / (latent_map * convolve2d(I, K, mode='same')) )
+    updated_image = updated_image + lambda_grad * np.gradient(updated_image)
+    
+    return updated_image
+
+def update_kernel(I, B, latent_map, beta_kernel):
+    """
+    Update the blur kernel using a least squares optimization approach.
+    """
+    # Adjust the kernel estimation based on the weighted least squares
+    kernel_update = np.sum(latent_map * (B - convolve2d(I, K, mode='same')))  # Weighted error term
+    kernel_update = kernel_update + beta_kernel * np.sum(K**2)  # Regularization
+
+    return kernel_update
+
 def optimize(B, K_init, lam=0.008, beta=2, tmax=50, jmax=4):
     I = B.copy()
     K = K_init.copy()

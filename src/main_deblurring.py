@@ -10,8 +10,8 @@ from metrics import compute_psnr, compute_ssim
 def main():
     parser = argparse.ArgumentParser(description='Blind image deblurring')
     parser.add_argument('--input', type=str, required=True, help='Path to input (blurred) image')
-    parser.add_argument('--output', type=str, default='results/deblurred.png', help='Path to save output joint image')
-    parser.add_argument('--kernel_output', type=str, default='results/kernel.png', help='Path to save estimated blur kernel')
+    parser.add_argument('--output', type=str, default='../results/deblurred.png', help='Path to save output joint image')
+    parser.add_argument('--kernel_output', type=str, default='../results/kernel.png', help='Path to save estimated blur kernel')
     parser.add_argument('--lambda_val', type=float, default=0.008, help='Regularization weight for latent image')
     parser.add_argument('--beta_val', type=float, default=2.0, help='Regularization weight for kernel estimation')
     parser.add_argument('--num_levels', type=int, default=5, help='Number of pyramid levels (unused in single-scale)')
