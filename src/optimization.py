@@ -74,16 +74,14 @@ def update_K(B, I, K_prev, M, beta, kernel_shape=(15, 15)):
     K = K / s if s > 1e-8 else np.ones(kernel_shape) / (kh * kw)
     return K
 
-def update_latent_image(I, B, K, M, lam):
+def update_latent_image(I, B, K_prev, M, lam):
     """
     Update the latent image using Richardson-Lucy or similar optimization method.
     """
-    # Convolve the latent image with the kernel and make sure the result matches the size of the blurry image
-    I_conv = convolve2d(I, K_prev, mode='same')  # 'same' ensures the output has the same size as the input
-    
-    # Handle the latent map and blurry image for the update
+    I_conv = convolve2d(I, K_prev, mode='same')  # Use the previous kernel (K_prev)
+    K_flip = np.flip(np.flip(K_prev, axis=0), axis=1)
     numerator = B / np.maximum(I_conv, 1e-8) - M + 1  # Element-wise operation with 'same' size arrays
-    update = convolve2d(numerator, np.flip(np.flip(K_prev, axis=0), axis=1), mode='same')
+    update = convolve2d(numerator, K_flip, mode='same')
     
     # Compute gradients for regularization
     grad_x, grad_y = np.gradient(I)  # Gradient in x and y directions
@@ -114,19 +112,19 @@ def update_kernel(I, B, latent_map, beta_kernel, K_prev):
 
 
 def optimize(B, K_init, latent_map, lam=0.008, beta=2.0, num_iterations=10):
-    I = np.copy(B)
-    K_prev = K_init
+    I = np.copy(B)  # Start with the blurry image as the initial estimate of the latent image
+    K_prev = K_init  # Use the initial kernel
 
     for iteration in range(num_iterations):
         print(f"Optimization Iteration {iteration + 1}/{num_iterations}")
 
-        # Update the latent image using the latent map and previous kernel
-        I = update_latent_image(I, K_prev, B, latent_map, lam)
+        # Update the latent image using the latent map and previous kernel (pass K_prev here)
+        I = update_latent_image(I, B, K_prev, latent_map, lam)
 
         # Recompute the latent map based on the updated latent image
         latent_map = np.where(convolve2d(I, K_prev, mode='same') <= 1, 1, 1 / convolve2d(I, K_prev, mode='same'))
 
         # Update the blur kernel using the updated latent image and latent map
-        K_prev = update_kernel(I, B, latent_map, beta, K_prev)
+        K_prev = update_kernel(I, B, latent_map, beta, K_prev)  # Pass previous kernel for update
 
-    return I, K_prev
+    return I, K_prev  # Return the final latent image and kernel
