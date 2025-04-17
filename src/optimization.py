@@ -111,7 +111,7 @@ def update_kernel(I, B, latent_map, beta_kernel, K_prev):
     return kernel_update
 
 
-def optimize(B, K_init, latent_map, lam=0.008, beta=2.0, num_iterations=10):
+def optimize(B, K_init, latent_map, lam=0.008, beta=2.0, num_iterations=50):
     I = np.copy(B)  # Start with the blurry image as the initial estimate of the latent image
     K_prev = K_init  # Use the initial kernel
 
