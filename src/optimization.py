@@ -125,6 +125,12 @@ def optimize(B, K_init, latent_map, lam=0.008, beta=2.0, num_iterations=10):
         latent_map = np.where(convolve2d(I, K_prev, mode='same') <= 1, 1, 1 / convolve2d(I, K_prev, mode='same'))
 
         # Update the blur kernel using the updated latent image and latent map
-        K_prev = update_kernel(I, B, latent_map, beta, K_prev)  # Pass previous kernel for update
-
+        K_prev = update_K(
+            B,                # blurry image
+            I,                # current latent image
+            K_prev,           # previous kernel
+            latent_map,       # your weight map M
+            beta, 
+            kernel_shape=K_prev.shape
+        )
     return I, K_prev  # Return the final latent image and kernel
