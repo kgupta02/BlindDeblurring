@@ -42,3 +42,6 @@ def main():
     # 7. Save outputs
     save_image(args.output, joint)
     save_kernel(args.kernel_output, K_est)
+
+if __name__ == "__main__":
+    main()
