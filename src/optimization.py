@@ -78,18 +78,18 @@ def update_latent_image(I, B, K, M, lam):
     """
     Update the latent image using Richardson-Lucy or similar optimization method.
     """
-    I_conv = convolve2d(I, K, mode='same')
-    K_flip = np.flip(np.flip(K, axis=0), axis=1)
-    numerator = B / np.maximum(I_conv, 1e-8) - M + 1
-    update = convolve2d(numerator, K_flip, mode='same')
+    # Convolve the latent image with the kernel and make sure the result matches the size of the blurry image
+    I_conv = convolve2d(I, K_prev, mode='same')  # 'same' ensures the output has the same size as the input
     
-    # Compute gradients (make sure to handle multiple dimensions)
-    grad_x, grad_y = np.gradient(I)  # Get gradients in x and y direction
+    # Handle the latent map and blurry image for the update
+    numerator = B / np.maximum(I_conv, 1e-8) - M + 1  # Element-wise operation with 'same' size arrays
+    update = convolve2d(numerator, np.flip(np.flip(K_prev, axis=0), axis=1), mode='same')
     
-    # Regularization term: sum of gradients for smoothness
-    regularizer = lam * (np.abs(grad_x) + np.abs(grad_y))
+    # Compute gradients for regularization
+    grad_x, grad_y = np.gradient(I)  # Gradient in x and y directions
+    regularizer = lam * (np.abs(grad_x) + np.abs(grad_y))  # Regularization term for smoothness
     
-    # Update the latent image
+    # Update the latent image using the regularized update
     updated_image = I * update / (1 + regularizer)
     
     return updated_image
