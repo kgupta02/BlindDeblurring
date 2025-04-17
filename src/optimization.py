@@ -45,7 +45,6 @@ def update_K(B, I, K_prev, M, beta, kernel_shape=(15, 15)):
         Wx = W_pix * conv_Ix
         Wy = W_pix * conv_Iy
 
-        # Crop Wx and Wy to match flipped_grad_Ix size
         Wx_patch = Wx[cy - kh // 2 : cy - kh // 2 + kh,
                        cx - kw // 2 : cx - kw // 2 + kw]
         Wy_patch = Wy[cy - kh // 2 : cy - kh // 2 + kh,
