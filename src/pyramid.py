@@ -11,24 +11,22 @@ def build_pyramid(image, num_levels=5, downscale=2):
         list of np.ndarray where elements are image at different levels
     """
     pyramid = [image]
+    latent_maps = [np.ones_like(image)]
+
     current = image
-
     for _ in range(1, num_levels):
-        # Compute new shape
-        new_h = int(np.ceil(current.shape[0]/downscale))
-        new_w = int(np.ceil(current.shape[1]/downscale))
-
-        # Resize to new shape
-        coarser = resize(
-            current, (new_h, new_w),
-            order=1,
-            preserve_range=True,
-            anti_aliasing=True
-        )
+        new_h = int(np.ceil(current.shape[0] / downscale))
+        new_w = int(np.ceil(current.shape[1] / downscale))
+        
+        coarser = resize(current, (new_h, new_w), order=1, preserve_range=True, anti_aliasing=True)
         pyramid.append(coarser)
+        
+        latent_map = np.ones_like(coarser)
+        latent_maps.append(latent_map)
+        
         current = coarser
 
-    return pyramid
+    return pyramid, latent_maps
     
 def upsample_kernel(kernel, scale_factor=2):
     """

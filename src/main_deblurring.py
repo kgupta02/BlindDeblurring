@@ -6,6 +6,7 @@ from io_utils import read_image, save_image, save_kernel
 from optimization import optimize
 from nonblind_deconv import nonblind_deconv
 from metrics import compute_psnr, compute_ssim
+from pyramid import build_pyramid
 
 def main():
     parser = argparse.ArgumentParser(description='Blind image deblurring')
@@ -14,7 +15,7 @@ def main():
     parser.add_argument('--kernel_output', type=str, default='../results/kernel.png', help='Path to save estimated blur kernel')
     parser.add_argument('--lambda_val', type=float, default=0.008, help='Regularization weight for latent image')
     parser.add_argument('--beta_val', type=float, default=2.0, help='Regularization weight for kernel estimation')
-    parser.add_argument('--num_levels', type=int, default=5, help='Number of pyramid levels (unused in single-scale)')
+    parser.add_argument('--num_levels', type=int, default=5, help='Number of pyramid levels (used for coarse-to-fine)')
     args = parser.parse_args()
 
     # 1. Read input blurred image
@@ -24,22 +25,25 @@ def main():
     kernel_shape = (15, 15)
     K_init = np.ones(kernel_shape, dtype=np.float32) / (kernel_shape[0] * kernel_shape[1])
 
-    # 3. Blind deblurring optimization
-    I_est, K_est = optimize(B, K_init, lam=args.lambda_val, beta=args.beta_val)
+    # 3. Build image pyramid and initialize latent maps
+    pyramid, latent_maps = build_pyramid(B, num_levels=args.num_levels, downscale=2)
 
-    # 4. Optional non-blind deconvolution refinement
+    # 4. Coarse-to-fine blind deblurring optimization
+    I_est, K_est = optimize(B, K_init, latent_map=latent_maps[0], lam=args.lambda_val, beta=args.beta_val)
+
+    # 5. Optional non-blind deconvolution refinement (optional)
     I_refined = nonblind_deconv(B, K_est, lambda_val=args.lambda_val)
 
-    # 5. Compute metrics against input for reference
+    # 6. Compute metrics against input for reference
     psnr_val = compute_psnr(B, I_refined)
     ssim_val = compute_ssim(B, I_refined)
     print(f"PSNR between input and deblurred: {psnr_val:.2f} dB")
     print(f"SSIM between input and deblurred: {ssim_val:.4f}")
 
-    # 6. Create joint image: original | deblurred
+    # 7. Create joint image: original | deblurred
     joint = np.concatenate((B, I_refined), axis=1)
 
-    # 7. Save outputs
+    # 8. Save outputs
     save_image(args.output, joint)
     save_kernel(args.kernel_output, K_est)
 

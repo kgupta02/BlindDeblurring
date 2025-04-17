@@ -74,32 +74,59 @@ def update_K(B, I, K_prev, M, beta, kernel_shape=(15, 15)):
     K = K / s if s > 1e-8 else np.ones(kernel_shape) / (kh * kw)
     return K
 
-def update_latent_image(I, K, B, latent_map, lambda_grad):
+def update_latent_image(I, B, K, M, lam):
     """
     Update the latent image using Richardson-Lucy or similar optimization method.
     """
-    updated_image = I * ( (B - latent_map * convolve2d(I, K, mode='same')) / (latent_map * convolve2d(I, K, mode='same')) )
-    updated_image = updated_image + lambda_grad * np.gradient(updated_image)
+    I_conv = convolve2d(I, K, mode='same')
+    K_flip = np.flip(np.flip(K, axis=0), axis=1)
+    numerator = B / np.maximum(I_conv, 1e-8) - M + 1
+    update = convolve2d(numerator, K_flip, mode='same')
+    
+    # Compute gradients (make sure to handle multiple dimensions)
+    grad_x, grad_y = np.gradient(I)  # Get gradients in x and y direction
+    
+    # Regularization term: sum of gradients for smoothness
+    regularizer = lam * (np.abs(grad_x) + np.abs(grad_y))
+    
+    # Update the latent image
+    updated_image = I * update / (1 + regularizer)
     
     return updated_image
 
-def update_kernel(I, B, latent_map, beta_kernel):
+def update_kernel(I, B, latent_map, beta_kernel, K_prev):
     """
     Update the blur kernel using a least squares optimization approach.
     """
-    # Adjust the kernel estimation based on the weighted least squares
-    kernel_update = np.sum(latent_map * (B - convolve2d(I, K, mode='same')))  # Weighted error term
-    kernel_update = kernel_update + beta_kernel * np.sum(K**2)  # Regularization
-
+    # Compute the residual between the blurry image and the current latent image convolved with the previous kernel
+    residual = B - convolve2d(I, latent_map * K_prev, mode='same')  # Use previous kernel
+    
+    # Compute the gradient of the residual with respect to the kernel
+    kernel_update = np.sum(latent_map * residual)  # Weighted error term
+    
+    # Add a regularization term based on the kernel (e.g., L2 regularization)
+    kernel_update = kernel_update + beta_kernel * np.sum(K_prev**2)  # Regularization term to avoid overfitting
+    
+    # Normalize the kernel to make sure it sums to 1
+    kernel_update = kernel_update / np.sum(kernel_update)
+    
     return kernel_update
 
-def optimize(B, K_init, lam=0.008, beta=2, tmax=50, jmax=4):
-    I = B.copy()
-    K = K_init.copy()
-    for j in range(jmax):
-        for t in range(tmax):
-            M = compute_mask(I, K)
-            I = update_I(I, B, K, M, lam)
-        M = compute_mask(I, K)
-        K = update_K(B, I, K, M, beta)
-    return I, K
+
+def optimize(B, K_init, latent_map, lam=0.008, beta=2.0, num_iterations=10):
+    I = np.copy(B)
+    K_prev = K_init
+
+    for iteration in range(num_iterations):
+        print(f"Optimization Iteration {iteration + 1}/{num_iterations}")
+
+        # Update the latent image using the latent map and previous kernel
+        I = update_latent_image(I, K_prev, B, latent_map, lam)
+
+        # Recompute the latent map based on the updated latent image
+        latent_map = np.where(convolve2d(I, K_prev, mode='same') <= 1, 1, 1 / convolve2d(I, K_prev, mode='same'))
+
+        # Update the blur kernel using the updated latent image and latent map
+        K_prev = update_kernel(I, B, latent_map, beta, K_prev)
+
+    return I, K_prev

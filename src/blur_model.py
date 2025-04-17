@@ -11,7 +11,6 @@ def blur_model(image, kernel):
     """
     blur_image = convolve2d(image, kernel, mode='same')
     latent_map = np.where(blur_image <= 1, 1, 1 / blur_image)
-    mask = np.where(blur_image <= 1, 1, 1 / blur_image)
     blur_image = latent_map * blur_image
 
     return blur_image
