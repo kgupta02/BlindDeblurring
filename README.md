@@ -23,11 +23,11 @@ BlindDeblurring/
     │
     ├── main_deblurring.py   # main script/entry point
     │
-    ├── io_utils.py          # handles input/output (reading, saving images, etc.)
+    ├── io_utils.py          # handles input/output
     ├── pyramid.py           # builds coarse-to-fine image pyramids
     ├── blur_model.py        # defines the blur model and latent map M
     ├── priors.py            # hyper-Laplacian prior & gradient utilities
     ├── optimization.py      # core iterative optimization logic
-    ├── nonblind_deconv.py   # optional: final non-blind deconvolution
-    └── metrics.py           # functions for PSNR, SSIM, etc. (if needed)
+    ├── nonblind_deconv.py   # final non-blind deconvolution
+    └── metrics.py           # functions for PSNR, SSIM, etc.
 ``` </pre>
