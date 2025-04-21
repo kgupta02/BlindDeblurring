@@ -1,4 +1,3 @@
-# priors.py
 '''
 GOAL - To provide implementations for:
     - Computing image gradients

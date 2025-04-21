@@ -1,6 +1,4 @@
-# pyramid.py
 # Constructs a coarse-to-fine pyramid of the input image
-
 import numpy as np
 from skimage.transform import resize
 

@@ -1,6 +1,4 @@
-# io_utils.py
 # Encapsulates all reading/writing of images and other data
-
 import os
 import numpy as np
 from skimage import io, color, img_as_ubyte
