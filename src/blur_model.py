@@ -1,3 +1,4 @@
+# blur_model.py
 from scipy.signal import convolve2d
 import numpy as np
 

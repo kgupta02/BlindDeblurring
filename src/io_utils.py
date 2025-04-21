@@ -1,4 +1,4 @@
-# Encapsulates all reading/writing of images and other data
+# io_utils.py
 import os
 import numpy as np
 from skimage import io, color, img_as_ubyte
@@ -18,30 +18,21 @@ def read_image(path, as_gray=True):
 def save_image(path, image):
     """
     Save a float32 NumPy array image to disk as an 8-bit PNG in [0,255].
-
-    Args:
-        path (str): Output file path
-        image (np.ndarray): Image array
     """
     image = np.clip(image, 0, 1)
-    image_ubyte = img_as_ubyte(image) # Convert to 8-bit
+    image_ubyte = img_as_ubyte(image)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     io.imsave(path, image_ubyte)
 
 def save_kernel(path, kernel):
     """
     Save a blur kernel as an image, scale to visualize kernel
-
-    Args:
-        path (str): Output file path
-        kernel (np.ndarray): blur kernel
     """
     if kernel.max() > 0:
         kernel_vis = kernel / kernel.max()
     else:
         kernel_vis = kernel
     kernel_vis = np.clip(kernel_vis, 0, 1)
-    # Save kernel as image
     kernel_ubyte = img_as_ubyte(kernel_vis)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     io.imsave(path, kernel_ubyte)
